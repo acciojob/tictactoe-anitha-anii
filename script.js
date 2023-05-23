@@ -27,7 +27,9 @@ function tapForSymbol(event) {
     }
 
     cells[cellIndex] = currentPlayer;
+	  message();
     checkWin();
+	  
   }
 }
 
@@ -58,11 +60,17 @@ function checkWin() {   //winner declear
       messageDiv.style.display = "block";
       messageDiv.className="winner";
       disableClicks();
+		
       break;
     }
   }
+	
 }
-
+function message(){
+	currentPlayer=(currentPlayer=="cross")?circle:cross;
+	statusText.textContent=`${currentPlayer},you're up` ;
+	
+}
 function disableClicks() {
   let squares = document.querySelectorAll('.square');
   squares.forEach(square => {
