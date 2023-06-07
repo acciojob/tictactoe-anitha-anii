@@ -1,40 +1,142 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-	<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            width: 32vw ;
+            margin: auto;
+        }
+        form{
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .grid{
+            display: grid;
+            gap: 5px;
+            height: 32vw;
+            background-color: black;
+            grid-template-columns: repeat(3, auto);
+            grid-template-rows: repeat(3, auto);
+        }
+        .grid > div {
+            background-color: tomato;
+            font-size: 40px;
+            width: 10vw;
+            height: 10vw;
+        }
+        h1{
+            text-align: center;
+        }
+        #game-container {
+            display: none;
+        }
+    </style>
 </head>
-
 <body>
-	<!-- the entire body must be written by student -->
-	 <div class="containet">
-       
+    <div class="container">
         <form>
-         <div class="myform">
-            <h1 id="h2">Tic Tac Toe</h1>
-        <div>
-            <label for="player-1">player-1</label>
-        <input type="text" id ="player1" placeholder="Enter name" required/>
+            <input type="text" id="player-1" required name="user1" placeholder="Enter Name">
+            <input type="text" id="player-2" required name="user2" placeholder="Enter Name">
+            <input type="submit" value="Start Game">
+        </form>
+        <div id="game-container">
+            <h1>Tic Tac Toe</h1>
+            <div id="message"></div>
+            <div class="grid">
+                <div id="1"></div>
+                <div id="2"></div>
+                <div id="3"></div>
+                <div id="4"></div>
+                <div id="5"></div>
+                <div id="6"></div>
+                <div id="7"></div>
+                <div id="8"></div>
+                <div id="9"></div>
+            </div>
+        </div>
     </div>
-<div>
-        <label for="player-2">player-2</label required>
-        <input type="text"  id ="player2" placeholder="Enter name"/>
-    </div>
-</div>
 
+    <script>
+        let user1, user2 ;
+        let turn = true ; // 1 or 2
+        let message ; 
+        const form = document.getElementsByTagName("form")[0];
+        const messageElement = document.getElementById("message");
+        const gameContainer = document.getElementById("game-container");
 
-        <button type="submit"id="submit">Start Game</button>
-    </form>
-    </div>
-    <div class="message">
-        <h1>Tic Tac Toe</h1>
-    <div class="gamebord">
-    </div>
-    </div>
-    <script type="text/javascript" src="./script.js">
-</script>
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            user1 = e.target["user1"].value
+            user2 = e.target["user2"].value;
+            message = `${user1}, you're up`;
+            messageElement.innerText = message ;
+            gameContainer.style.display = "block";
+        })
+        const grid = document.getElementsByClassName("grid")[0]
 
+        function checkIfGameOver(){
+            // [
+            //     [x, x, o], i
+            //     [o, o, x],
+            //     [o, x,  ]
+            // ]
+            let arr = [[], [], []];
+            //          0   1   2
+            console.log(grid.children.length)
+            for(let i = 0 ; i < grid.children.length ; i++){
+                const element = grid.children[i];
+                let id = parseInt(element.id)// 1, 2, 3 ... 9
+                let index = parseInt( (id-1) / 3);
+                // id = 0, 1, 2, 3, 4, 5, 6, 7, 8
+                arr[index].push(element.innerText)
+            }
+
+            for(let i = 0 ; i < arr.length; i++) {
+                if(arr[i][0] === arr[i][1] && arr[i][1] === arr[i][2]) return true ;
+                if(arr[0][i] === arr[1][i] && arr[1][i] === arr[2][i]) return true ;
+            }
+
+            if(arr[0][0] === arr[1][1] && arr[1][1] === arr[2][2]) return true ;
+            if(arr[0][2] === arr[1][1] && arr[1][1] === arr[2][0]) return true ;
+            return false ;
+        }
+
+        function onClickCell(e){
+            // write logic of the gam
+            let targetElement = e.target ;
+            if(targetElement.innerText){
+                return ;
+            }
+            if(turn){
+                targetElement.innerText = "X";
+            }
+            else {
+                targetElement.innerText = "O"
+            }
+
+            let isGameOver = checkIfGameOver();
+            if(isGameOver){
+                message = `${turn ? user1 : user2}, congratulations you won`;
+                messageElement.innerText = message ;
+            }
+
+            turn = !turn;
+            message = `${turn ? user2 : user1}, you're up` ;
+            messageElement.innerText = message; 
+        }
+
+        for(let i = 0 ; i < 9; i++){
+            let id = (i+1).toString();
+            let gridItem = document.getElementById(id);
+
+            gridItem.addEventListener("click", onClickCell)
+        }
+
+    </script>
 </body>
-
 </html>
