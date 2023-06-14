@@ -57,58 +57,61 @@
   </div>
 
   <script>
-    document.getElementById("startForm").addEventListener("submit", function(event) {
-      event.preventDefault();
-      var player1 = document.getElementById("player1").value;
-      var player2 = document.getElementById("player2").value;
-      startGame(player1, player2);
+
+document.getElementById("startForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+  var player1 = document.getElementById("player1").value;
+  var player2 = document.getElementById("player2").value;
+  startGame(player1, player2);
+});
+
+function startGame(player1, player2) {
+  document.getElementById("game").style.display = "block";
+  document.querySelector(".message").textContent = player1 + ", you're up!";
+
+  var currentPlayer = "X";
+  var cells = document.querySelectorAll(".cell");
+  cells.forEach(function(cell) {
+    cell.addEventListener("click", function() {
+      if (cell.textContent === "") {
+        cell.textContent = currentPlayer;
+        if (checkWin(currentPlayer)) {
+          document.querySelector(".message").textContent = currentPlayer + " congratulations, you won!";
+          cells.forEach(function(cell) {
+            cell.removeEventListener("click", arguments.callee);
+          });
+        } else if (checkDraw()) {
+          document.querySelector(".message").textContent = "It's a draw!";
+        } else {
+          currentPlayer = currentPlayer === "X" ? "O" : "X";
+          document.querySelector(".message").textContent = (currentPlayer === "X" ? player1 : player2) + ", you're up!";
+        }
+      }
     });
+  });
+}
 
-    function startGame(player1, player2) {
-      document.getElementById("game").style.display = "block";
-      document.querySelector(".message").textContent = player1 + ", you're up!";
+function checkWin(player) {
+  var winningCombinations = [
+    [1, 2, 3], [4, 5, 6], [7, 8, 9], // Rows
+    [1, 4, 7], [2, 5, 8], [3, 6, 9], // Columns
+    [1, 5, 9], [3, 5, 7] // Diagonals
+  ];
+  return winningCombinations.some(function(combination) {
+    return combination.every(function(cell) {
+      return document.getElementById(cell).textContent === player;
+    });
+  });
+}
 
-      var currentPlayer = "X";
-      var cells = document.querySelectorAll(".cell");
-      cells.forEach(function(cell) {
-        cell.addEventListener("click", function() {
-          if (cell.textContent === "") {
-            cell.textContent = currentPlayer;
-            if (checkWin(currentPlayer)) {
-              document.querySelector(".message").textContent = currentPlayer + " congratulations, you won!";
-              cells.forEach(function(cell) {
-                cell.removeEventListener("click", arguments.callee);
-              });
-            } else if (checkDraw()) {
-              document.querySelector(".message").textContent = "It's a draw!";
-            } else {
-              currentPlayer = currentPlayer === "X" ? "O" : "X";
-              document.querySelector(".message").textContent = (currentPlayer === "X" ? player1 : player2) + ", you're up!";
-            }
-          }
-        });
-      });
-    }
+function checkDraw() {
+  var cells = document.querySelectorAll(".cell");
+  return Array.from(cells).every(function(cell) {
+    return cell.textContent !== "";
+  });
+}
 
-    function checkWin(player) {
-      var winningCombinations = [
-        [1, 2, 3], [4, 5, 6], [7, 8, 9], // Rows
-        [1, 4, 7], [2, 5, 8], [3, 6, 9], // Columns
-        [1, 5, 9], [3, 5, 7] // Diagonals
-      ];
-      return winningCombinations.some(function(combination) {
-        return combination.every(function(cell) {
-          return document.getElementById(cell).textContent === player;
-        });
-      });
-    }
-
-    function checkDraw() {
-      var cells = document.querySelectorAll(".cell");
-      return Array.from(cells).every(function(cell) {
-        return cell.textContent !== "";
-      });
-    }
+	  
   </script>
 </body>
 </html>
