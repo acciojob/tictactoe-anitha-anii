@@ -32,10 +32,10 @@
     <div class="start">
       <h1>Tic Tac Toe</h1>
       <form id="startForm">
-        <label for="player-1">Player 1:</label>
-        <input type="text" id="player-1" required><br>
-        <label for="player-2">Player 2:</label>
-        <input type="text" id="player-2" required><br>
+        <label for="player1">Player 1:</label>
+        <input type="text" id="player1" required><br>
+        <label for="player2">Player 2:</label>
+        <input type="text" id="player2" required><br>
         <button type="submit" id="submit">Start Game</button>
       </form>
     </div>
@@ -59,8 +59,8 @@
   <script>
     document.getElementById("startForm").addEventListener("submit", function(event) {
       event.preventDefault();
-      var player1 = document.getElementById("player-1").value;
-      var player2 = document.getElementById("player-2").value;
+      var player1 = document.getElementById("player1").value;
+      var player2 = document.getElementById("player2").value;
       startGame(player1, player2);
     });
 
