@@ -6,14 +6,17 @@
         .container {
             text-align: center;
             margin-top: 50px;
-			display:grid;
-			grid-template:repeat(3,auto);
         }
+.board {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    width: 320px;
+    margin: 0 auto;
+    margin-top: 20px;
+}
 
-        .board {
-            display: inline-block;
-            margin-top: 20px;
-        }
 
         .cell {
             width: 100px;
@@ -36,9 +39,9 @@
         <h1>Tic Tac Toe</h1>
         <form id="player-form">
             <label for="player-1">Player 1:</label>
-            <input type="text" id="player-1 Player1" required>
+            <input type="text" id="player1" required>
             <label for="player-2">Player 2:</label>
-            <input type="text" id="player-2 Player2" required>
+            <input type="text" id="player2" required>
             <button type="submit" id="submit">Submit</button>
         </form>
         <div id="board" class="board" style="display: none;">
