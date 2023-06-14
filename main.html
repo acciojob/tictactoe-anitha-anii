@@ -1,93 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tic Tac Toe</title>
-    <style>
-        .container {
-            text-align: center;
-            margin-top: 50px;
-        }
-.board {
-    display: grid;
-    grid-template-rows: repeat(3, 1fr);
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-    width: 320px;
-    margin: 0 auto;
-    margin-top: 20px;
-}
-
-
-        .cell {
-            width: 100px;
-            height: 100px;
-            border: 1px solid black;
-            display: inline-block;
-            font-size: 40px;
-            line-height: 100px;
-            text-align: center;
-        }
-
-        .message {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-    </style>
+  <title>Tic Tac Toe</title>
+  <style>
+    .container {
+      text-align: center;
+      margin-top: 50px;
+    }
+    .board {
+      display: inline-block;
+      border: 1px solid black;
+    }
+    .board .cell {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      border: 1px solid black;
+      font-size: 48px;
+      line-height: 100px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .message {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Tic Tac Toe</h1>
-        <form id="player-form">
-            <label for="player-1">Player 1:</label>
-            <input type="text" id="player1" required>
-            <label for="player-2">Player 2:</label>
-            <input type="text" id="player2" required>
-            <button type="submit" id="submit">Submit</button>
-        </form>
-        <div id="board" class="board" style="display: none;">
-            <div class="message"></div>
-            <div class="cell" id="1"></div>
-            <div class="cell" id="2"></div>
-            <div class="cell" id="3"></div>
-            <div class="cell" id="4"></div>
-            <div class="cell" id="5"></div>
-            <div class="cell" id="6"></div>
-            <div class="cell" id="7"></div>
-            <div class="cell" id="8"></div>
-            <div class="cell" id="9"></div>
-        </div>
+  <div class="container">
+    <div class="start">
+      <h1>Tic Tac Toe</h1>
+      <form id="startForm">
+        <label for="player-1">Player 1:</label>
+        <input type="text" id="player-1" required><br>
+        <label for="player-2">Player 2:</label>
+        <input type="text" id="player-2" required><br>
+        <button type="submit" id="submit">Start Game</button>
+      </form>
     </div>
+    <div id="game" style="display: none;">
+      <h1>Tic Tac Toe</h1>
+      <div class="message"></div>
+      <div class="board">
+        <div class="cell" id="1"></div>
+        <div class="cell" id="2"></div>
+        <div class="cell" id="3"></div>
+        <div class="cell" id="4"></div>
+        <div class="cell" id="5"></div>
+        <div class="cell" id="6"></div>
+        <div class="cell" id="7"></div>
+        <div class="cell" id="8"></div>
+        <div class="cell" id="9"></div>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        // JavaScript code to handle the game logic
-        document.getElementById('player-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            var player1 = document.getElementById('player1').value;
-            var player2 = document.getElementById('player2').value;
+  <script>
+    document.getElementById("startForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      var player1 = document.getElementById("player-1").value;
+      var player2 = document.getElementById("player-2").value;
+      startGame(player1, player2);
+    });
 
-            document.getElementById('player-form').style.display = 'none';
-            document.getElementById('board').style.display = 'block';
+    function startGame(player1, player2) {
+      document.getElementById("game").style.display = "block";
+      document.querySelector(".message").textContent = player1 + ", you're up!";
 
-            document.querySelector('.message').textContent = player1 + ", you're up.";
-
-            var currentPlayer = 1;
-            var cells = document.querySelectorAll('.cell');
-            cells.forEach(function(cell) {
-                cell.addEventListener('click', function() {
-                    if (this.textContent === '') {
-                        if (currentPlayer === 1) {
-                            this.textContent = 'X';
-                            currentPlayer = 2;
-                            document.querySelector('.message').textContent = player2 + ", you're up.";
-                        } else {
-                            this.textContent = 'O';
-                            currentPlayer = 1;
-                            document.querySelector('.message').textContent = player1 + ", you're up.";
-                        }
-                    }
-                });
-            });
+      var currentPlayer = "X";
+      var cells = document.querySelectorAll(".cell");
+      cells.forEach(function(cell) {
+        cell.addEventListener("click", function() {
+          if (cell.textContent === "") {
+            cell.textContent = currentPlayer;
+            if (checkWin(currentPlayer)) {
+              document.querySelector(".message").textContent = currentPlayer + " congratulations, you won!";
+              cells.forEach(function(cell) {
+                cell.removeEventListener("click", arguments.callee);
+              });
+            } else if (checkDraw()) {
+              document.querySelector(".message").textContent = "It's a draw!";
+            } else {
+              currentPlayer = currentPlayer === "X" ? "O" : "X";
+              document.querySelector(".message").textContent = (currentPlayer === "X" ? player1 : player2) + ", you're up!";
+            }
+          }
         });
-    </script>
+      });
+    }
+
+    function checkWin(player) {
+      var winningCombinations = [
+        [1, 2, 3], [4, 5, 6], [7, 8, 9], // Rows
+        [1, 4, 7], [2, 5, 8], [3, 6, 9], // Columns
+        [1, 5, 9], [3, 5, 7] // Diagonals
+      ];
+      return winningCombinations.some(function(combination) {
+        return combination.every(function(cell) {
+          return document.getElementById(cell).textContent === player;
+        });
+      });
+    }
+
+    function checkDraw() {
+      var cells = document.querySelectorAll(".cell");
+      return Array.from(cells).every(function(cell) {
+        return cell.textContent !== "";
+      });
+    }
+  </script>
 </body>
 </html>
+
