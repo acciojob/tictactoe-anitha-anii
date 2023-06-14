@@ -1,153 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe</title>
     <style>
         .container {
-            width: 32vw;
-            margin: auto;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .grid {
-            display: grid;
-            gap: 5px;
-            height: 32vw;
-            background-color: black;
-            grid-template-columns: repeat(3, auto);
-            grid-template-rows: repeat(3, auto);
-        }
-        .grid > div {
-            background-color: tomato;
-            font-size: 40px;
-            width: 10vw;
-            height: 10vw;
-        }
-        h1 {
             text-align: center;
+            margin-top: 50px;
         }
-        .message {
-            text-align: center;
-            font-size: 24px;
+
+        .board {
+            display: inline-block;
             margin-top: 20px;
         }
-        #game-container {
-            display: none;
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+            display: inline-block;
+            font-size: 40px;
+            line-height: 100px;
+            text-align: center;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <form>
-            <input type="text" id="player-1" required name="player-1" placeholder="Enter Name for Player 1">
-            <input type="text" id="player-2" required name="player-2" placeholder="Enter Name for Player 2">
-            <input type="submit" value="Start Game" id="submit">
+        <h1>Tic Tac Toe</h1>
+        <form id="player-form">
+            <label for="player-1">Player 1:</label>
+            <input type="text" id="player-1" required>
+            <label for="player-2">Player 2:</label>
+            <input type="text" id="player-2" required>
+            <button type="submit" id="submit">Submit</button>
         </form>
-        <div id="game-container">
-            <h1>Tic Tac Toe</h1>
+        <div id="board" class="board" style="display: none;">
             <div class="message"></div>
-            <div class="grid">
-                <div id="1"></div>
-                <div id="2"></div>
-                <div id="3"></div>
-                <div id="4"></div>
-                <div id="5"></div>
-                <div id="6"></div>
-                <div id="7"></div>
-                <div id="8"></div>
-                <div id="9"></div>
-            </div>
+            <div class="cell" id="1"></div>
+            <div class="cell" id="2"></div>
+            <div class="cell" id="3"></div>
+            <div class="cell" id="4"></div>
+            <div class="cell" id="5"></div>
+            <div class="cell" id="6"></div>
+            <div class="cell" id="7"></div>
+            <div class="cell" id="8"></div>
+            <div class="cell" id="9"></div>
         </div>
     </div>
 
     <script>
-        let user1, user2;
-        let turn = true; // 1 or 2
-        let message;
-        const form = document.getElementsByTagName("form")[0];
-        const messageElement = document.querySelector(".message");
-        const gameContainer = document.getElementById("game-container");
+        // JavaScript code to handle the game logic
+        document.getElementById('player-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var player1 = document.getElementById('player-1').value;
+            var player2 = document.getElementById('player-2').value;
 
-        form.addEventListener("submit", (e) => {
-            e.preventDefault();
-            user1 = e.target["player-1"].value;
-            user2 = e.target["player-2"].value;
-            message = `${user1}, you're up`;
-            messageElement.innerText = message;
-            gameContainer.style.display = "block";
+            document.getElementById('player-form').style.display = 'none';
+            document.getElementById('board').style.display = 'block';
+
+            document.querySelector('.message').textContent = player1 + ", you're up.";
+
+            var currentPlayer = 1;
+            var cells = document.querySelectorAll('.cell');
+            cells.forEach(function(cell) {
+                cell.addEventListener('click', function() {
+                    if (this.textContent === '') {
+                        if (currentPlayer === 1) {
+                            this.textContent = 'X';
+                            currentPlayer = 2;
+                            document.querySelector('.message').textContent = player2 + ", you're up.";
+                        } else {
+                            this.textContent = 'O';
+                            currentPlayer = 1;
+                            document.querySelector('.message').textContent = player1 + ", you're up.";
+                        }
+                    }
+                });
+            });
         });
-
-        const grid = document.querySelector(".grid");
-        let cells = Array.from(grid.children);
-        let winningCombos = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-            [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-            [0, 4, 8], [2, 4, 6] // diagonals
-        ];
-
-        let gameOver = false;
-
-        function checkWin(player) {
-            for (let combo of winningCombos) {
-                if (
-                    cells[combo[0]].innerText === player &&
-                    cells[combo[1]].innerText === player &&
-                    cells[combo[2]].innerText === player
-                ) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function checkIfGameOver() {
-            if (
-                checkWin("X") ||
-                checkWin("O") ||
-                cells.every(cell => cell.innerText !== "")
-            ) {
-                gameOver = true;
-            }
-        }
-
-        function switchTurn() {
-            turn = !turn;
-            message = turn ? `${user1}, you're up` : `${user2}, you're up`;
-            messageElement.innerText = message;
-        }
-
-        function onClickCell(e) {
-            if (gameOver || e.target.innerText !== "") return;
-
-            const currentPlayer = turn ? "X" : "O";
-            e.target.innerText = currentPlayer;
-            checkIfGameOver();
-
-            if (checkWin(currentPlayer)) {
-                message = `${currentPlayer === "X" ? user1 : user2}, congratulations you won!`;
-                messageElement.innerText = message;
-                gameOver = true;
-                return;
-            }
-
-            if (!gameOver) {
-                switchTurn();
-            }
-        }
-
-        for (let i = 0; i < 9; i++) {
-            let id = (i + 1).toString();
-            let gridItem = document.getElementById(id);
-
-            gridItem.addEventListener("click", onClickCell);
-        }
     </script>
 </body>
 </html>
-
