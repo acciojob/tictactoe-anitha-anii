@@ -5,44 +5,47 @@
   <style>
     .container {
       text-align: center;
-      margin-top: 50px;
     }
-    .board {
-      display: inline-block;
-      border: 1px solid black;
+
+    #board {
+      margin: 20px auto;
+      width: 300px;
+      height: 300px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 2px;
+      border: 1px solid #000;
     }
-    .board .cell {
-      display: inline-block;
-      width: 100px;
-      height: 100px;
-      border: 1px solid black;
-      font-size: 48px;
-      line-height: 100px;
-      text-align: center;
+
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
       cursor: pointer;
     }
+
     .message {
       margin-top: 20px;
-      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="start">
-      <h1>Tic Tac Toe</h1>
-      <form id="startForm">
-        <label for="player1">Player 1:</label>
-        <input type="text" id="player1" required><br>
-        <label for="player2">Player 2:</label>
-        <input type="text" id="player2" required><br>
-        <button type="submit" id="submit">Start Game</button>
-      </form>
+    <div id="player-input">
+      <label for="player-1">Player 1: </label>
+      <input type="text" id="player-1" placeholder="Enter name for Player 1">
+      <br>
+      <label for="player-2">Player 2: </label>
+      <input type="text" id="player-2" placeholder="Enter name for Player 2">
+      <br>
+      <button id="submit">Submit</button>
     </div>
     <div id="game" style="display: none;">
       <h1>Tic Tac Toe</h1>
       <div class="message"></div>
-      <div class="board">
+      <div id="board">
         <div class="cell" id="1"></div>
         <div class="cell" id="2"></div>
         <div class="cell" id="3"></div>
@@ -57,62 +60,88 @@
   </div>
 
   <script>
+    document.getElementById("submit").addEventListener("click", function() {
+      var player1 = document.getElementById("player-1").value;
+      var player2 = document.getElementById("player-2").value;
 
-document.getElementById("startForm").addEventListener("submit", function(event) {
-  event.preventDefault();
-  var player1 = document.getElementById("player1").value;
-  var player2 = document.getElementById("player2").value;
-  startGame(player1, player2);
-});
+      if (player1 !== "" && player2 !== "") {
+        document.getElementById("player-input").style.display = "none";
+        document.getElementById("game").style.display = "block";
 
-function startGame(player1, player2) {
-  document.getElementById("game").style.display = "block";
-  document.querySelector(".message").textContent = player1 + ", you're up!";
+        var currentPlayer = player1;
+        var cells = document.getElementsByClassName("cell");
 
-  var currentPlayer = "X";
-  var cells = document.querySelectorAll(".cell");
-  cells.forEach(function(cell) {
-    cell.addEventListener("click", function() {
-      if (cell.textContent === "") {
-        cell.textContent = currentPlayer;
-        if (checkWin(currentPlayer)) {
-          document.querySelector(".message").textContent = currentPlayer + " congratulations, you won!";
-          cells.forEach(function(cell) {
-            cell.removeEventListener("click", arguments.callee);
-          });
-        } else if (checkDraw()) {
-          document.querySelector(".message").textContent = "It's a draw!";
-        } else {
-          currentPlayer = currentPlayer === "X" ? "O" : "X";
-          document.querySelector(".message").textContent = (currentPlayer === "X" ? player1 : player2) + ", you're up!";
+        for (var i = 0; i < cells.length; i++) {
+          cells[i].addEventListener("click", cellClick);
+        }
+
+        setMessage(currentPlayer + ", you're up!");
+
+        function cellClick() {
+          if (this.innerHTML === "") {
+            this.innerHTML = currentPlayer === player1 ? "X" : "O";
+            this.removeEventListener("click", cellClick);
+
+            if (checkWin()) {
+              setMessage(currentPlayer + ", congratulations, you won!");
+              removeCellClickListeners();
+            } else if (checkDraw()) {
+              setMessage("It's a draw!");
+              removeCellClickListeners();
+            } else {
+              currentPlayer = currentPlayer === player1 ? player2 : player1;
+              setMessage(currentPlayer + ", you're up!");
+            }
+          }
+        }
+
+        function setMessage(message) {
+          document.querySelector(".message").innerHTML = message;
+        }
+
+        function checkWin() {
+          var winConditions = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+            [1, 4, 7],
+            [2, 5, 8],
+            [3, 6, 9],
+            [1, 5, 9],
+            [3, 5, 7]
+          ];
+
+          for (var i = 0; i < winConditions.length; i++) {
+            var [a, b, c] = winConditions[i];
+            if (
+              cells[a - 1].innerHTML !== "" &&
+              cells[a - 1].innerHTML === cells[b - 1].innerHTML &&
+              cells[a - 1].innerHTML === cells[c - 1].innerHTML
+            ) {
+              return true;
+            }
+          }
+
+          return false;
+        }
+
+        function checkDraw() {
+          for (var i = 0; i < cells.length; i++) {
+            if (cells[i].innerHTML === "") {
+              return false;
+            }
+          }
+
+          return true;
+        }
+
+        function removeCellClickListeners() {
+          for (var i = 0; i < cells.length; i++) {
+            cells[i].removeEventListener("click", cellClick);
+          }
         }
       }
     });
-  });
-}
-
-function checkWin(player) {
-  var winningCombinations = [
-    [1, 2, 3], [4, 5, 6], [7, 8, 9], // Rows
-    [1, 4, 7], [2, 5, 8], [3, 6, 9], // Columns
-    [1, 5, 9], [3, 5, 7] // Diagonals
-  ];
-  return winningCombinations.some(function(combination) {
-    return combination.every(function(cell) {
-      return document.getElementById(cell).textContent === player;
-    });
-  });
-}
-
-function checkDraw() {
-  var cells = document.querySelectorAll(".cell");
-  return Array.from(cells).every(function(cell) {
-    return cell.textContent !== "";
-  });
-}
-
-	  
   </script>
 </body>
 </html>
-
